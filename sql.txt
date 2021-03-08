@@ -1,0 +1,319 @@
+-- SCHEMA: summaries_shema
+
+
+/*CREATE SCHEMA summaries_shema
+    AUTHORIZATION root;
+*/
+
+-- Table: summaries_shema.t_applicants
+ DROP TABLE summaries_shema.t_applicants;
+
+CREATE TABLE summaries_shema.t_applicants
+(
+    "IdApplicant" text COLLATE pg_catalog."default" NOT NULL,
+    "FirstName" text COLLATE pg_catalog."default" NOT NULL,
+    "LastName" text COLLATE pg_catalog."default" NOT NULL,
+    "Patronymic" text COLLATE pg_catalog."default",
+    "DateBirth" date NOT NULL,
+    "IdGender" integer NOT NULL,
+    "DateCreate" date NOT NULL,
+    "DateFinish" date NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_applicants
+    OWNER to root;
+
+
+INSERT INTO summaries_shema.t_applicants(
+	"IdApplicant", "FirstName", "LastName", "Patronymic", "DateBirth", "IdGender", "DateCreate", "DateFinish")
+	VALUES ('1', 'Петр', 'Петров', 'Петрович', '12-12-1986', 1, '01-01-2020', '01-01-2900');
+	
+	
+INSERT INTO summaries_shema.t_applicants(
+	"IdApplicant", "FirstName", "LastName", "Patronymic", "DateBirth", "IdGender", "DateCreate", "DateFinish")
+	VALUES ('2', 'Иван', 'Иванович', 'Иванов', '04-04-1997', 1, '01-01-2020', '01-01-2900');
+	
+	
+INSERT INTO summaries_shema.t_applicants(
+	"IdApplicant", "FirstName", "LastName", "Patronymic", "DateBirth", "IdGender", "DateCreate", "DateFinish")
+	VALUES ('3', 'Марина', 'Морская', 'Васильевна', '07-11-1999', 2, '01-01-2020', '01-01-2900');
+
+
+-- Table: summaries_shema.t_summaries
+
+DROP TABLE summaries_shema.t_summaries;
+
+CREATE TABLE summaries_shema.t_summaries
+(
+    "IdSummary" text COLLATE pg_catalog."default" NOT NULL,
+    "IdApplicant" text COLLATE pg_catalog."default" NOT NULL,
+    "DateCreate" date NOT NULL,
+    "DateFinish" date NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_summaries
+    OWNER to root;
+
+INSERT INTO summaries_shema.t_summaries(
+	"IdSummary", "IdApplicant", "DateCreate", "DateFinish")
+	VALUES ('1', '1','01-01-2020', '01-01-2900');
+	
+INSERT INTO summaries_shema.t_summaries(
+	"IdSummary", "IdApplicant", "DateCreate", "DateFinish")
+	VALUES ('2', '2','01-01-2020', '01-01-2900');
+	
+	
+INSERT INTO summaries_shema.t_summaries(
+	"IdSummary", "IdApplicant", "DateCreate", "DateFinish")
+	VALUES ('3', '3','01-01-2020', '01-01-2900');
+
+
+-- Table: summaries_shema.t_contactstype
+
+DROP TABLE summaries_shema.t_contactstype;
+
+CREATE TABLE summaries_shema.t_contactstype
+(
+    "IdContactsType" integer NOT NULL,
+    "Name" text COLLATE pg_catalog."default" NOT NULL,
+    "IsNotActual" integer NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_contactstype
+    OWNER to root;
+
+
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (1, 'Телефон', 0);
+	
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (2, 'Адрес электронной почты', 0);	
+	
+	
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (3, 'Skype', 0);	
+	
+	
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (4, 'Github', 0);		
+	
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (5, 'Linkedin', 0);
+	
+INSERT INTO summaries_shema.t_contactstype(
+	"IdContactsType", "Name", "IsNotActual")
+	VALUES (6, 'Иной контакт', 0);	
+
+
+
+-- Table: summaries_shema.t_contacts
+
+DROP TABLE summaries_shema.t_contacts;
+
+CREATE TABLE summaries_shema.t_contacts
+(
+    "IdContact" text COLLATE pg_catalog."default" NOT NULL,
+    "IdApplicant" text COLLATE pg_catalog."default" NOT NULL,
+    "IdContactsType" integer NOT NULL,
+    "Contact" text COLLATE pg_catalog."default" NOT NULL,
+    "IsNotActual" integer NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_contacts
+    OWNER to root;
+
+
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (1, 1, 1, '+375(29)123-45-67', 0);
+		
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (2, 1, 4, 'http://github.com/petya', 0);
+	
+	
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (3, 1, 2, 'petrovich@gmail.com', 0);	
+	
+
+	
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (4, 2, 1, '+375(29)87-65-43', 0);
+		
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (5, 2, 4, 'http://github.com/vanya', 0);
+	
+	
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (6, 2, 3, 'ivanko', 0);
+	
+	
+
+	
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (7, 3, 1, '+375(29)999-99-99', 0);
+		
+INSERT INTO summaries_shema.t_contacts(
+	"IdContact", "IdApplicant", "IdContactsType", "Contact", "IsNotActual")
+	VALUES (8, 3, 5, 'https://www.linkedin.com/in/mariya/', 0);
+
+
+-- Table: summaries_shema.t_сompetencestype
+
+DROP TABLE summaries_shema."t_сompetencestype";
+
+CREATE TABLE summaries_shema."t_сompetencestype"
+(
+    "IdCompetence" integer NOT NULL,
+    "Name" text COLLATE pg_catalog."default" NOT NULL,
+    "IsNotActual" integer NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema."t_сompetencestype"
+    OWNER to root;
+
+
+
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (1, 'Git', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (2, 'Spring Boot', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (3, 'HTML', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (4, 'JavaEE', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (5, 'Java Core', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (6, 'Maven', 0);
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (7, 'REST', 0);
+	
+	
+INSERT INTO summaries_shema."t_сompetencestype"(
+	"IdCompetence", "Name", "IsNotActual")
+	VALUES (8, 'Spring', 0);
+
+
+-- Table: summaries_shema.t_competences_summaries
+
+DROP TABLE summaries_shema.t_competences_summaries;
+
+CREATE TABLE summaries_shema.t_competences_summaries
+(
+    "IdSummary" text COLLATE pg_catalog."default" NOT NULL,
+    "IdCompetence" text COLLATE pg_catalog."default" NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_competences_summaries
+    OWNER to root;
+
+
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (1, 1);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (1, 2);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (1, 3);	
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+       "IdSummary", "IdCompetence")
+	VALUES (2, 1);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (2, 4);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (2, 5);	
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (3, 6);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (3, 7);
+	
+INSERT INTO summaries_shema.t_competences_summaries(
+	"IdSummary", "IdCompetence")
+	VALUES (3, 8);
+
+-- Table: summaries_shema.t_gendertype
+
+DROP TABLE summaries_shema.t_gendertype;
+
+CREATE TABLE summaries_shema.t_gendertype
+(
+    "IdGender" integer NOT NULL,
+    "Name" text COLLATE pg_catalog."default" NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE summaries_shema.t_gendertype
+    OWNER to root;
+
+
+INSERT INTO summaries_shema.t_gendertype(
+	"IdGender", "Name")
+	VALUES (1, 'Мужской');
+	
+	
+INSERT INTO summaries_shema.t_gendertype(
+	"IdGender", "Name")
+	VALUES (2, 'Женский');	
+
+
+GRANT ALL PRIVILEGES ON DATABASE "summaries_bd" to root;
+
+GRANT UPDATE ON ALL TABLES IN SCHEMA summaries_shema TO root;
+
+GRANT ALL PRIVILEGES on SCHEMA summaries_shema TO "root";
+	
