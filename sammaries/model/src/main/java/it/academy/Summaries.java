@@ -1,7 +1,5 @@
 package it.academy;
 
-
-import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
