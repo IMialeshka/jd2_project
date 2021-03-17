@@ -45,7 +45,7 @@ public class BuilderQuerySql implements BuilderQuery{
         String name = treeNode.getListNameColumns().get(pName);
         int counter = queryParams.size()+1;
         String paramQueryName = "p"+name + counter;
-        String result = treeNode.getNameAlias() + ".\"" + name + "\"=:"+paramQueryName;
+        String result = "CAST("+treeNode.getNameAlias() + ".\"" + name + "\" as text) =:"+paramQueryName;
         queryParams.put(paramQueryName, value);
         treeEntities.includeInQuery(pClass.getName());
         while(treeNode.getNameParent() != null){
@@ -63,7 +63,7 @@ public class BuilderQuerySql implements BuilderQuery{
         String name = treeNode.getListNameColumns().get(pName);
         int counter = queryParams.size()+1;
         String paramQueryName = "p"+name + counter;
-        String result = treeNode.getNameAlias() + ".\"" + name + "\" like (:"+paramQueryName + ")";
+        String result = "CAST("+treeNode.getNameAlias() + ".\"" + name + "\" as text) like (:"+paramQueryName + ")";
         queryParams.put(paramQueryName, value.replace("*","%"));
         treeEntities.includeInQuery(pClass.getName());
         while(treeNode.getNameParent() != null){

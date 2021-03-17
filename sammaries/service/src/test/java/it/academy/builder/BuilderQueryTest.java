@@ -47,7 +47,7 @@ public class BuilderQueryTest extends BaseTest {
         builderQuery.select(new SelectValue<>(Summaries.class, "id"));
         builderQuery.select(new SelectValue<>(CompetencesType.class, "name"));
         builderQuery.where(builderQuery.or(builderQuery.include(Applicants.class, "lastName", "*ов"),
-                builderQuery.equally(GenderType.class, "name", "Женский")));
+                builderQuery.equally(GenderType.class, "id", "2")));
         builderQuery.generateQuery();
         String textQuery = builderQuery.getQuery();
         NativeQuery sqlQuery = session.createSQLQuery(textQuery);
