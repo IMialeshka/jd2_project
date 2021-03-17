@@ -5,6 +5,15 @@ public class ParentEntityLink {
     private String nameJoinTable;
     private String joinParentCollum;
 
+    @Override
+    public String toString() {
+        return "ParentEntityLink{" +
+                "joinCollum='" + joinCollum + '\'' +
+                ", nameJoinTable='" + nameJoinTable + '\'' +
+                ", joinParentCollum='" + joinParentCollum + '\'' +
+                '}';
+    }
+
     public String getJoinCollum() {
         return joinCollum;
     }

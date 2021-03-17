@@ -18,9 +18,22 @@ public class TreeEntities {
 
  public void includeInQuery(String key){
      TreeNode treeNode = treeEntities.get(key);
-     treeNode.setIncludeInQuery(true);
+     treeNode.setIncludeInQuery(1);
      treeEntities.put(key, treeNode);
  }
+
+ public void excludeInQuery(String key){
+        TreeNode treeNode = treeEntities.get(key);
+        treeNode.setIncludeInQuery(0);
+        treeEntities.put(key, treeNode);
+    }
+
+    public boolean getCountIsInclude(){
+        for (TreeNode value : treeEntities.values()) {
+           if(value.isIncludeInQuery > 0) return true;
+        }
+        return false;
+    }
 
  public TreeNode getNode(String key){
         return treeEntities.get(key);

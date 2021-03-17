@@ -6,7 +6,7 @@
 */
 
 -- Table: summaries_shema.t_applicants
- DROP TABLE summaries_shema.t_applicants;
+ --DROP TABLE summaries_shema.t_applicants;
 
 CREATE TABLE summaries_shema.t_applicants
 (
@@ -17,7 +17,8 @@ CREATE TABLE summaries_shema.t_applicants
     "DateBirth" date NOT NULL,
     "IdGender" integer NOT NULL,
     "DateCreate" date NOT NULL,
-    "DateFinish" date NOT NULL
+    "DateFinish" date NOT NULL,
+    PRIMARY KEY ("IdApplicant")
 )
 
 TABLESPACE pg_default;
@@ -43,14 +44,15 @@ INSERT INTO summaries_shema.t_applicants(
 
 -- Table: summaries_shema.t_summaries
 
-DROP TABLE summaries_shema.t_summaries;
+--DROP TABLE summaries_shema.t_summaries;
 
 CREATE TABLE summaries_shema.t_summaries
 (
     "IdSummary" text COLLATE pg_catalog."default" NOT NULL,
     "IdApplicant" text COLLATE pg_catalog."default" NOT NULL,
     "DateCreate" date NOT NULL,
-    "DateFinish" date NOT NULL
+    "DateFinish" date NOT NULL,
+    PRIMARY KEY ("IdSummary")
 )
 
 TABLESPACE pg_default;
@@ -74,13 +76,14 @@ INSERT INTO summaries_shema.t_summaries(
 
 -- Table: summaries_shema.t_contactstype
 
-DROP TABLE summaries_shema.t_contactstype;
+--DROP TABLE summaries_shema.t_contactstype;
 
 CREATE TABLE summaries_shema.t_contactstype
 (
     "IdContactsType" integer NOT NULL,
     "Name" text COLLATE pg_catalog."default" NOT NULL,
-    "IsNotActual" integer NOT NULL
+    "IsNotActual" integer NOT NULL,
+    PRIMARY KEY ("IdContactsType")
 )
 
 TABLESPACE pg_default;
@@ -119,7 +122,7 @@ INSERT INTO summaries_shema.t_contactstype(
 
 -- Table: summaries_shema.t_contacts
 
-DROP TABLE summaries_shema.t_contacts;
+--DROP TABLE summaries_shema.t_contacts;
 
 CREATE TABLE summaries_shema.t_contacts
 (
@@ -127,7 +130,8 @@ CREATE TABLE summaries_shema.t_contacts
     "IdApplicant" text COLLATE pg_catalog."default" NOT NULL,
     "IdContactsType" integer NOT NULL,
     "Contact" text COLLATE pg_catalog."default" NOT NULL,
-    "IsNotActual" integer NOT NULL
+    "IsNotActual" integer NOT NULL,
+    PRIMARY KEY ("IdContact")
 )
 
 TABLESPACE pg_default;
@@ -176,66 +180,67 @@ INSERT INTO summaries_shema.t_contacts(
 	VALUES (8, 3, 5, 'https://www.linkedin.com/in/mariya/', 0);
 
 
--- Table: summaries_shema.t_сompetencestype
+-- Table: summaries_shema.t_competencestype
 
-DROP TABLE summaries_shema."t_сompetencestype";
+--DROP TABLE summaries_shema."t_competencestype";
 
-CREATE TABLE summaries_shema."t_сompetencestype"
+CREATE TABLE summaries_shema."t_competencestype"
 (
     "IdCompetence" integer NOT NULL,
     "Name" text COLLATE pg_catalog."default" NOT NULL,
-    "IsNotActual" integer NOT NULL
+    "IsNotActual" integer NOT NULL,
+    PRIMARY KEY ("IdCompetence")
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE summaries_shema."t_сompetencestype"
+ALTER TABLE summaries_shema."t_competencestype"
     OWNER to root;
 
 
 
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (1, 'Git', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (2, 'Spring Boot', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (3, 'HTML', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (4, 'JavaEE', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (5, 'Java Core', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (6, 'Maven', 0);
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (7, 'REST', 0);
 	
 	
-INSERT INTO summaries_shema."t_сompetencestype"(
+INSERT INTO summaries_shema."t_competencestype"(
 	"IdCompetence", "Name", "IsNotActual")
 	VALUES (8, 'Spring', 0);
 
 
 -- Table: summaries_shema.t_competences_summaries
 
-DROP TABLE summaries_shema.t_competences_summaries;
+--DROP TABLE summaries_shema.t_competences_summaries;
 
 CREATE TABLE summaries_shema.t_competences_summaries
 (
@@ -287,12 +292,13 @@ INSERT INTO summaries_shema.t_competences_summaries(
 
 -- Table: summaries_shema.t_gendertype
 
-DROP TABLE summaries_shema.t_gendertype;
+--DROP TABLE summaries_shema.t_gendertype;
 
 CREATE TABLE summaries_shema.t_gendertype
 (
     "IdGender" integer NOT NULL,
-    "Name" text COLLATE pg_catalog."default" NOT NULL
+    "Name" text COLLATE pg_catalog."default" NOT NULL,
+    PRIMARY KEY ("IdGender")
 )
 
 TABLESPACE pg_default;

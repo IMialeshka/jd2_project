@@ -4,31 +4,48 @@ import it.academy.builder.utilitys.tree.ParentEntityLink;
 import it.academy.builder.utilitys.SelectValue;
 import it.academy.builder.utilitys.TypeJoin;
 import it.academy.builder.utilitys.Utilitys;
+import it.academy.builder.utilitys.tree.TreeEntities;
 import it.academy.builder.utilitys.tree.TreeNode;
+import org.hibernate.Session;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
 public class BuilderQuerySql implements BuilderQuery{
     private int counterTable;
-    private String shemaName = "summaries_shema";
-    private String fromPart = "";
-    private String groupByPart = "";
-    String wherePart = "";
-    String joinTablePart = "";
-    String selectPart = "";
+    private String fromPart;
+    private String groupByPart;
+    private String wherePart;
+    private String joinTablePart;
+    private String selectPart;
+    private final String shemaName;
+    TreeEntities treeEntities = new TreeEntities();
+    Map<String, Object> queryParams = new HashMap<>();
+
+    public BuilderQuerySql(Session session) {
+        this.shemaName = session.getSessionFactory().getProperties().get("hibernate.default_schema").toString();
+    }
 
     @Override
     public <T>  void from(Class<T>  fClass) throws ClassNotFoundException {
         crateEntityThree(fClass, null, null);
+        this.counterTable = 0;
+        this.fromPart = "";
+        this.groupByPart = "";
+        this.wherePart = "";
+        this.joinTablePart = "";
+        this.selectPart = "";
     }
 
     @Override
     public <T> String equally(Class<T> pClass, String pName, String value) throws ClassNotFoundException {
         TreeNode treeNode = treeEntities.getNode(pClass.getName());
 
-        String paramQueryName = "p"+pName + queryParams.size()+1;
-        String result = treeNode.getNameAlias() + "." + pName + "=:"+paramQueryName;
+        String name = treeNode.getListNameColumns().get(pName);
+        int counter = queryParams.size()+1;
+        String paramQueryName = "p"+name + counter;
+        String result = treeNode.getNameAlias() + ".\"" + name + "\"=:"+paramQueryName;
         queryParams.put(paramQueryName, value);
         treeEntities.includeInQuery(pClass.getName());
         while(treeNode.getNameParent() != null){
@@ -40,7 +57,25 @@ public class BuilderQuerySql implements BuilderQuery{
     }
 
     @Override
-    public String add(String ... v){
+    public <T> String include(Class<T> pClass, String pName, String value) throws ClassNotFoundException {
+        TreeNode treeNode = treeEntities.getNode(pClass.getName());
+
+        String name = treeNode.getListNameColumns().get(pName);
+        int counter = queryParams.size()+1;
+        String paramQueryName = "p"+name + counter;
+        String result = treeNode.getNameAlias() + ".\"" + name + "\" like (:"+paramQueryName + ")";
+        queryParams.put(paramQueryName, value.replace("*","%"));
+        treeEntities.includeInQuery(pClass.getName());
+        while(treeNode.getNameParent() != null){
+            Class<?> aClass = Class.forName(treeNode.getNameParent());
+            treeEntities.includeInQuery(aClass.getName());
+            treeNode = treeEntities.getNode(aClass.getName());
+        }
+        return result;
+    }
+
+    @Override
+    public String and(String ... v){
         StringBuilder result = new StringBuilder();
         String separator = " and ";
         if(v.length == 1){
@@ -94,11 +129,11 @@ public class BuilderQuerySql implements BuilderQuery{
         StringBuilder nameNewColumn = new StringBuilder();
         for (SelectValue<T> selectValue : selectValues) {
             Class<T> pClass = selectValue.getSelectEntity();
-            String name = selectValue.getSelectColumn();
             TreeNode treeNode = treeEntities.getNode(pClass.getName());
+            String name = treeNode.getListNameColumns().get(selectValue.getSelectColumn());
 
             stringBuilder.append(separatorConcat).append(treeNode.getNameAlias()).append(".\"").append(name).append("\"");
-            separatorConcat = " ";
+            separatorConcat = ",' ',";
             nameNewColumn.append("_").append(treeNode.getNameAlias()).append("_").append(name);
 
 
@@ -119,9 +154,9 @@ public class BuilderQuerySql implements BuilderQuery{
     public <T> void select(SelectValue<T> selectValues) throws ClassNotFoundException {
 
             Class<T> pClass = selectValues.getSelectEntity();
-            String name = selectValues.getSelectColumn();
 
             TreeNode treeNode = treeEntities.getNode(pClass.getName());
+            String name = treeNode.getListNameColumns().get(selectValues.getSelectColumn());
             String separator = ",";
             if(this.selectPart.isEmpty())
                 separator = "";
@@ -152,57 +187,57 @@ public class BuilderQuerySql implements BuilderQuery{
 
     @Override
     public void generateQuery(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Map.Entry<String, TreeNode> next : treeEntities.getTreeEntities().entrySet()) {
-            TreeNode treeNode = next.getValue();
-            if(treeNode.getTypeJoin() == TypeJoin.FROM)
-            {
-                stringBuilder.append(" From ").append(shemaName).append(".\"").append(treeNode.getNameTable())
-                        .append("\" as ").append(treeNode.getNameAlias());
-                this.fromPart = stringBuilder.toString();
-                stringBuilder.setLength(0);
+        while (treeEntities.getCountIsInclude()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Map.Entry<String, TreeNode> next : treeEntities.getTreeEntities().entrySet()) {
+                TreeNode treeNode = next.getValue();
+                if (treeNode.getTypeJoin() == TypeJoin.FROM) {
+                    stringBuilder.append(" From ").append(shemaName).append(".\"").append(treeNode.getNameTable())
+                            .append("\" as ").append(treeNode.getNameAlias());
+                    this.fromPart = stringBuilder.toString();
+                    stringBuilder.setLength(0);
 
-                stringBuilder.append("group by ");
-                String separator = "";
-                for (String value : treeNode.getListNameColumns().values()) {
-                    stringBuilder.append(separator).append(treeNode.getNameAlias()).append(".\"")
-                            .append(value).append("\"");
-                    separator = ",";
-                }
-               this.groupByPart = stringBuilder.toString();
-            }
-            else{
-                if(treeNode.isIncludeInQuery()){
-                    TreeNode pTreeNode = treeEntities.getNode(treeNode.getNameParent());
-                    if(treeNode.getParentEntityLink().getNameJoinTable() == null){
-                        stringBuilder.append("\n ").append(treeNode.getTypeJoin()).append(" ").append(shemaName).append(".\"")
-                                .append(treeNode.getNameTable()).append("\" as ").append(treeNode.getNameAlias())
-                                .append(" ON ").append(treeNode.getNameAlias()).append(".\"")
-                                .append(treeNode.getParentEntityLink().getJoinCollum()).append("\" = ")
-                                .append(pTreeNode.getNameAlias()).append(".\"")
-                                .append(treeNode.getParentEntityLink().getJoinCollum())
-                                .append("\"");
-                        this.joinTablePart = this.joinTablePart + stringBuilder.toString();
-                        stringBuilder.setLength(0);
+                    stringBuilder.append("group by ");
+                    String separator = "";
+                    for (String value : treeNode.getListNameColumns().values()) {
+                        stringBuilder.append(separator).append(treeNode.getNameAlias()).append(".\"")
+                                .append(value).append("\"");
+                        separator = ",";
                     }
-                    else{
-                        String aliasJoinTable = treeNode.getNameAlias() + "_" + treeNode.getParentEntityLink().getNameJoinTable();
-                        stringBuilder.append("\n").append(" ").append(TypeJoin.JOIN).append(" ").append(shemaName).append(".\"")
-                            .append(treeNode.getParentEntityLink().getNameJoinTable()).append("\" as")
-                                .append(aliasJoinTable).append(" ON ").append(aliasJoinTable).append(". \"")
-                                .append(treeNode.getParentEntityLink().getJoinParentCollum()).append("\" = ")
-                                .append(pTreeNode.getNameAlias()).append(". \"").append(treeNode.getParentEntityLink().getJoinParentCollum())
-                                .append("\"").append(" ").append("\n")
-                                .append(treeNode.getTypeJoin()).append(" ").append(shemaName).append(".\"")
-                                .append(treeNode.getNameTable()).append("\" as ").append(treeNode.getNameAlias())
-                                .append(" ON ").append(treeNode.getNameAlias()).append(".\"")
-                                .append(treeNode.getParentEntityLink().getJoinCollum()).append("\" = ")
-                                .append(aliasJoinTable).append(".\"")
-                                .append(treeNode.getParentEntityLink().getJoinCollum())
-                                .append("\"");
+                    this.groupByPart = stringBuilder.toString();
+                    treeEntities.excludeInQuery(next.getKey());
+                    stringBuilder.setLength(0);
+                } else {
+                    TreeNode pTreeNode = treeEntities.getNode(treeNode.getNameParent());
+                    if (treeNode.isIncludeInQuery() && pTreeNode.wasIncludeInQuery()) {
+                        if (treeNode.getParentEntityLink().getNameJoinTable() == null) {
+                            stringBuilder.append("\n ").append(treeNode.getTypeJoin()).append(" ").append(shemaName).append(".\"")
+                                    .append(treeNode.getNameTable()).append("\" as ").append(treeNode.getNameAlias())
+                                    .append(" ON ").append(treeNode.getNameAlias()).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getJoinCollum()).append("\" = ")
+                                    .append(pTreeNode.getNameAlias()).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getJoinCollum())
+                                    .append("\"");
+                        } else {
+                            String aliasJoinTable = treeNode.getNameAlias() + "_" + treeNode.getParentEntityLink().getNameJoinTable();
+                            stringBuilder.append("\n").append(" ").append(TypeJoin.JOIN).append(" ").append(shemaName).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getNameJoinTable()).append("\" as ")
+                                    .append(aliasJoinTable).append(" ON ").append(aliasJoinTable).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getJoinParentCollum()).append("\" = ")
+                                    .append(pTreeNode.getNameAlias()).append(".\"").append(treeNode.getParentEntityLink().getJoinParentCollum())
+                                    .append("\"").append(" ").append("\n")
+                                    .append(treeNode.getTypeJoin()).append(" ").append(shemaName).append(".\"")
+                                    .append(treeNode.getNameTable()).append("\" as ").append(treeNode.getNameAlias())
+                                    .append(" ON ").append(treeNode.getNameAlias()).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getJoinCollum()).append("\" = ")
+                                    .append(aliasJoinTable).append(".\"")
+                                    .append(treeNode.getParentEntityLink().getJoinCollum())
+                                    .append("\"");
+                        }
                         this.joinTablePart = this.joinTablePart + stringBuilder.toString();
                         stringBuilder.setLength(0);
-                        }
+                        treeEntities.excludeInQuery(next.getKey());
+                    }
                 }
             }
         }
@@ -211,7 +246,7 @@ public class BuilderQuerySql implements BuilderQuery{
 
     @Override
     public String getQuery(){
-        return "select " + selectPart + "\n" + fromPart + "\n" + joinTablePart + "\n" + "where " + wherePart + "\n" + groupByPart;
+        return "select " + selectPart + "\n" + fromPart + joinTablePart + "\n" + "where " + wherePart + "\n" + groupByPart;
     }
 
     @Override
@@ -226,13 +261,13 @@ public class BuilderQuerySql implements BuilderQuery{
         if(nameParent == null)
         {
             treeNode.setTypeJoin(TypeJoin.FROM);
-            treeNode.setIncludeInQuery(true);
+            treeNode.setIncludeInQuery(1);
         }
         else{
             treeNode.setNameParent(nameParent);
             treeNode.setParentEntityLink(parentEntityLink);
             treeNode.setTypeJoin(TypeJoin.JOIN);
-            treeNode.setIncludeInQuery(false);
+            treeNode.setIncludeInQuery(-1);
         }
         treeNode.setNameAlias("a" + this.counterTable);
         this.counterTable = this.counterTable + 1;
@@ -248,5 +283,6 @@ public class BuilderQuerySql implements BuilderQuery{
             }
         }
     }
+
 
 }

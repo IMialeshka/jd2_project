@@ -12,9 +12,22 @@ public class TreeNode {
         private Map<String, String> listNameColumns = new HashMap<>();
         private TypeJoin typeJoin;
         private ParentEntityLink parentEntityLink;
-        boolean isIncludeInQuery;
+        int isIncludeInQuery;
 
-        public String getNameParent() {
+    @Override
+    public String toString() {
+        return "TreeNode{" +
+                "nameParent='" + nameParent + '\'' +
+                ", nameTable='" + nameTable + '\'' +
+                ", nameAlias='" + nameAlias + '\'' +
+                ", listNameColumns=" + listNameColumns +
+                ", typeJoin=" + typeJoin +
+                ", parentEntityLink=" + parentEntityLink +
+                ", isIncludeInQuery=" + isIncludeInQuery +
+                '}';
+    }
+
+    public String getNameParent() {
             return nameParent;
         }
 
@@ -56,10 +69,14 @@ public class TreeNode {
         }
 
         public boolean isIncludeInQuery() {
-            return isIncludeInQuery;
+            return isIncludeInQuery == 1;
         }
 
-        public void setIncludeInQuery(boolean includeInQuery) {
+        public boolean wasIncludeInQuery() {
+        return isIncludeInQuery == 0;
+    }
+
+        public void setIncludeInQuery(int includeInQuery) {
             isIncludeInQuery = includeInQuery;
         }
 

@@ -32,8 +32,8 @@ public class Summaries {
     @ManyToMany
     @JoinTable(
       name = "`t_competences_summaries`",
-            joinColumns = {@JoinColumn(name = "`IdCompetence`")},
-            inverseJoinColumns = {@JoinColumn(name = "`IdSummary`")}
+            joinColumns = {@JoinColumn(name = "`IdSummary`")},
+            inverseJoinColumns = {@JoinColumn(name = "`IdCompetence`")}
 
     )
     private List<CompetencesType> competences;

@@ -1,11 +1,9 @@
 package it.academy.builder.utilitys;
 
+import com.sun.xml.bind.v2.model.core.ID;
 import it.academy.builder.utilitys.tree.ParentEntityLink;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +46,12 @@ public class Utilitys {
 
     public static <T>  Map<String, ParentEntityLink> getTableJoin(Class<T>  pClass){
         Map<String, ParentEntityLink > mapJoinTable= new HashMap<>();
-        ParentEntityLink parentEntityLink = new ParentEntityLink();
+        String idName = null;
         for (Field field :pClass.getDeclaredFields()){
+            for (Id id : field.getDeclaredAnnotationsByType(Id.class)) {
+                    idName = getNameElement(field.getDeclaredAnnotationsByType(Column.class)[0].name());
+                }
+            ParentEntityLink parentEntityLink = new ParentEntityLink();
             for (JoinColumn column : field.getDeclaredAnnotationsByType(JoinColumn.class)){
                 String joinClass = (field.getType()).getName();
                 String nameColumn = column.name();
@@ -73,12 +75,23 @@ public class Utilitys {
                 parentEntityLink.setNameJoinTable(getNameElement(annotation.name()));
 
                 for(JoinColumn joinColumn : annotation.joinColumns()){
-                    parentEntityLink.setJoinCollum(getNameElement(joinColumn.name()));
+                    parentEntityLink.setJoinParentCollum(getNameElement(joinColumn.name()));
                 }
 
                 for(JoinColumn joinColumn : annotation.inverseJoinColumns()){
-                    parentEntityLink.setJoinParentCollum(getNameElement(joinColumn.name()));
+                    parentEntityLink.setJoinCollum(getNameElement(joinColumn.name()));
                 }
+                mapJoinTable.put(nameJoinEntity, parentEntityLink);
+            }
+
+            for (OneToMany oneToMany : field.getDeclaredAnnotationsByType(OneToMany.class)) {
+                String nameJoinEntity = field.getGenericType().toString();
+                Pattern pattern = Pattern.compile("<{1}\\S+>{1}");
+                Matcher matcher = pattern.matcher(nameJoinEntity);
+                if (matcher.find()) {
+                    nameJoinEntity = nameJoinEntity.substring(matcher.start()+1, nameJoinEntity.length()-1);
+                }
+                parentEntityLink.setJoinCollum(idName);
                 mapJoinTable.put(nameJoinEntity, parentEntityLink);
             }
         }

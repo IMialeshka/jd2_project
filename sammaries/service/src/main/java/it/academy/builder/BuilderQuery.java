@@ -2,15 +2,9 @@ package it.academy.builder;
 
 
 import it.academy.builder.utilitys.SelectValue;
-import it.academy.builder.utilitys.tree.TreeEntities;
-
-import java.util.HashMap;
 import java.util.Map;
 
 public interface BuilderQuery {
-    TreeEntities treeEntities = new TreeEntities();
-    Map<String, Object> queryParams = new HashMap<>();
-
     <T> void from(Class<T> fClass) throws ClassNotFoundException;
     <T> String equally(Class<T> pClass, String pName, String value) throws ClassNotFoundException;
 
@@ -23,7 +17,10 @@ public interface BuilderQuery {
     void generateQuery();
 
     String getQuery();
-    String add(String ... v);
+
+    <T> String include(Class<T> pClass, String pName, String value) throws ClassNotFoundException;
+
+    String and(String ... v);
     String or(String ... v);
 
     Map<String, Object> getQueryParams();
